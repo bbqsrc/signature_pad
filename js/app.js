@@ -1,7 +1,7 @@
-var wrapper = document.getElementById("signature-pad"),
-    clearButton = wrapper.querySelector("[data-action=clear]"),
-    saveButton = wrapper.querySelector("[data-action=save]"),
-    canvas = wrapper.querySelector("canvas"),
+var wrapper = $(document.getElementById("signature-pad")),
+    clearButton = wrapper.find("[data-action=clear]")[0],
+    saveButton = wrapper.find("[data-action=save]")[0],
+    canvas = wrapper.find("canvas")[0],
     signaturePad;
 
 // Adjust canvas coordinate space taking into account pixel ratio,
@@ -11,22 +11,29 @@ function resizeCanvas() {
     var ratio =  window.devicePixelRatio || 1;
     canvas.width = canvas.offsetWidth * ratio;
     canvas.height = canvas.offsetHeight * ratio;
+    if (!canvas.getContext) {
+        if (FlashCanvas) {
+            FlashCanvas.initElement(canvas);
+        } else {
+            throw new Error("FlashCanvas missing.");
+        }
+    }
     canvas.getContext("2d").scale(ratio, ratio);
 }
 
 window.onresize = resizeCanvas;
 resizeCanvas();
 
-signaturePad = new SignaturePad(canvas);
+signaturePad = new SignaturePad(canvas, {minWidth: 1});
 
-clearButton.addEventListener("click", function (event) {
+$(clearButton).on("click", function (event) {
     signaturePad.clear();
 });
 
-saveButton.addEventListener("click", function (event) {
+$(saveButton).on("click", function (event) {
     if (signaturePad.isEmpty()) {
         alert("Please provide signature first.");
     } else {
-        window.open(signaturePad.toDataURL());
+        $('textarea').text(signaturePad.toDataURL());
     }
 });
