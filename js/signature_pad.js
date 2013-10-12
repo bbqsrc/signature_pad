@@ -25,8 +25,8 @@ var SignaturePad = (function (document) {
             opts = options || {};
 
         this.velocityFilterWeight = opts.velocityFilterWeight || 0.7;
-        this.minWidth = opts.minWidth || 2//0.5;
-        this.maxWidth = opts.maxWidth || 4.5//2.5;
+        this.minWidth = opts.minWidth || 0.5;
+        this.maxWidth = opts.maxWidth || 2.5;
         this.dotSize = opts.dotSize || function () {
             return (this.minWidth + this.maxWidth) / 2;
         };
