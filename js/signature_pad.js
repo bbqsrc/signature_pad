@@ -5,7 +5,7 @@
  * Copyright 2013 Szymon Nowak
  * Released under the MIT license
  * 
- * Mangled by Brendan Molloy to use jQuery and FlashCanvas for IE support.
+ * Mangled by Brendan Molloy to handle old event model and FlashCanvas for IE support.
  *
  * The main idea and some parts of the code (e.g. drawing variable width Bézier curve) are taken from:
  * http://corner.squareup.com/2012/07/smoother-signatures.html
@@ -19,6 +19,16 @@
  */
 var SignaturePad = (function (document) {
     "use strict";
+
+    function on(node, eventName, func) {
+        if (node.addEventListener) {
+            node.addEventListener(eventName, func);
+        } else if (node.attachEvent) {
+            node.attachEvent('on' + eventName, function(e) {
+                func.call(this, e || window.event);
+            });
+        }
+    }
 
     var SignaturePad = function (canvas, options) {
         var self = this,
@@ -34,8 +44,10 @@ var SignaturePad = (function (document) {
         this.backgroundColor = opts.backgroundColor || "white";
 
         this._canvas = canvas;
+
+        // Handle old browsers without <canvas> support
         if (!canvas.getContext) {
-            if (FlashCanvas) {
+            if (window.FlashCanvas) {
                 FlashCanvas.initElement(canvas);
             } else {
                 throw new Error("FlashCanvas missing.");
@@ -48,7 +60,7 @@ var SignaturePad = (function (document) {
         // Handle mouse events
         this._mouseButtonDown = false;
 
-        $(canvas).on("mousedown", function (event) {
+        on(canvas, "mousedown", function (event) {
             if (event.which === 1) {
                 self._mouseButtonDown = true;
                 self._reset();
@@ -58,14 +70,14 @@ var SignaturePad = (function (document) {
             }
         });
 
-        $(canvas).on("mousemove", function (event) {
+        on(canvas, "mousemove", function (event) {
             if (self._mouseButtonDown) {
                 var point = self._createPoint(event);
                 self._addPoint(point);
             }
         });
 
-        $(document).on("mouseup", function (event) {
+        on(document, "mouseup", function (event) {
             if (event.which === 1 && self._mouseButtonDown) {
                 self._mouseButtonDown = false;
 
@@ -84,7 +96,7 @@ var SignaturePad = (function (document) {
         });
 
         // Handle touch events
-        $(canvas).on("touchstart", function (event) {
+        on(canvas, "touchstart", function (event) {
             self._reset();
 
             var touch = event.changedTouches[0],
@@ -92,7 +104,7 @@ var SignaturePad = (function (document) {
             self._addPoint(point);
         });
 
-        $(canvas).on("touchmove", function (event) {
+        on(canvas, "touchmove", function (event) {
             // Prevent scrolling;
             event.preventDefault();
 
@@ -101,7 +113,7 @@ var SignaturePad = (function (document) {
             self._addPoint(point);
         });
 
-        $(document).on("touchend", function (event) {
+        on(document, "touchend", function (event) {
             var wasCanvasTouched = event.target === self._canvas,
                 canDrawCurve = self.points.length > 2,
                 point = self.points[0],
