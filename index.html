@@ -9,23 +9,22 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
 
   <link rel="stylesheet" href="css/signature-pad.css">
-  <script src="js/jquery.min.js"></script>
   <!--[if lt IE 9]><script src="js/flashcanvas.js"></script><![endif]-->
 </head>
 <body>
-  <a id="github" href="https://github.com/szimek/signature_pad">
+  <a id="github" href="https://github.com/bbqsrc/signature_pad">
     <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub">
   </a>
 
   <div id="signature-pad" class="m-signature-pad">
     <div class="m-signature-pad--body">
-      <canvas></canvas>
+      <canvas id='canvas'></canvas>
     </div>
     <div class="m-signature-pad--footer">
       <div class="description">Sign above</div>
-      <button class="button clear" data-action="clear">Clear</button>
+      <button id='clear' class="button clear" data-action="clear">Clear</button>
       <textarea></textarea>
-      <button class="button save" data-action="save">Save</button>
+      <button id='save' class="button save" data-action="save">Save</button>
     </div>
     <div></div>
   </div>

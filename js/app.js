@@ -1,8 +1,20 @@
-var wrapper = $(document.getElementById("signature-pad")),
-    clearButton = wrapper.find("[data-action=clear]")[0],
-    saveButton = wrapper.find("[data-action=save]")[0],
-    canvas = wrapper.find("canvas")[0],
+var clearButton = document.getElementById("clear"),
+    saveButton = document.getElementById("save"),
+    canvas = document.getElementById("canvas"),
+    output = document.getElementById("clear"),
     signaturePad;
+
+
+function on(node, eventName, func) {
+    if (node.addEventListener) {
+        node.addEventListener(eventName, func);
+    } else if (node.attachEvent) {
+        node.attachEvent('on' + eventName, function(e) {
+            func.call(this, e || window.event);
+        });
+    }
+}
+
 
 // Adjust canvas coordinate space taking into account pixel ratio,
 // to make it look crisp on mobile devices.
@@ -12,7 +24,7 @@ function resizeCanvas() {
     canvas.width = canvas.offsetWidth * ratio;
     canvas.height = canvas.offsetHeight * ratio;
     if (!canvas.getContext) {
-        if (FlashCanvas) {
+        if (window.FlashCanvas) {
             FlashCanvas.initElement(canvas);
         } else {
             throw new Error("FlashCanvas missing.");
@@ -26,14 +38,14 @@ resizeCanvas();
 
 signaturePad = new SignaturePad(canvas, {minWidth: 1});
 
-$(clearButton).on("click", function (event) {
+on(clearButton, "click", function (event) {
     signaturePad.clear();
 });
 
-$(saveButton).on("click", function (event) {
+on(saveButton, "click", function (event) {
     if (signaturePad.isEmpty()) {
         alert("Please provide signature first.");
     } else {
-        $('textarea').text(signaturePad.toDataURL());
+        output.innerHTML = signaturePad.toDataURL();
     }
 });
